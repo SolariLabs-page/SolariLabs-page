@@ -2,7 +2,7 @@
   "name": "solarilabs-inventory",
   "version": "1.0.0",
   "type": "module",
-  "engines": { "node": "18.x" },
+  "engines": { "node": "24.x" },
   "dependencies": {
     "mongoose": "^8.0.0",
     "cloudinary": "^2.0.0",

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solarilabs · Tienda</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand">
+      <img src="img/SLlogo.jpg" alt="Solarilabs" class="brand-logo">
+      <span class="brand-name">Solarilabs</span>
+    </a>
+    <nav class="site-nav">
+      <a href="index.html" class="nav-link active">Tienda</a>
+      <a href="dashboard.html" class="nav-link">Ventas</a>
+      <a href="inventory.html" class="nav-link">Inventario</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="container">
+      <h1>Filtra la luz.<br><span>Protege tu visión.</span></h1>
+      <p>Lentes con filtro de luz azul. Elige el color según la hora del día.</p>
+      <div class="lens-legend">
+        <span class="lens-chip"><span class="lens-dot dot-amarillo"></span> Amarillo — Uso diurno</span>
+        <span class="lens-chip"><span class="lens-dot dot-naranja"></span> Naranja — Tarde (5pm+)</span>
+        <span class="lens-chip"><span class="lens-dot dot-rojo"></span> Rojo — Nocturno (sueño)</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="filter-bar">
+    <div class="container">
+      <span class="filter-label">Lente</span>
+      <button class="pill active" data-lens="">Todos</button>
+      <button class="pill" data-lens="amarillo"><span class="pill-dot dot-amarillo"></span>Amarillo</button>
+      <button class="pill" data-lens="naranja"><span class="pill-dot dot-naranja"></span>Naranja</button>
+      <button class="pill" data-lens="rojo"><span class="pill-dot dot-rojo"></span>Rojo</button>
+      <span class="sep"></span>
+      <span class="filter-label">Marco</span>
+      <button class="pill" data-frame="">Todos</button>
+      <button class="pill" data-frame="negro"><span class="pill-dot dot-negro"></span>Negro</button>
+      <button class="pill" data-frame="transparente"><span class="pill-dot dot-transparente"></span>Transparente</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="loading" class="state-loading" hidden>Cargando productos…</div>
+    <div id="empty"   class="state-empty"   hidden>No hay productos con esos filtros.</div>
+    <div id="grid"    class="products-grid"></div>
+  </div>
+</main>
+
+<!-- Sell modal -->
+<div id="modal-sell" class="modal" hidden>
+  <div class="modal-overlay" id="sell-overlay"></div>
+  <div class="modal-box">
+    <h2>Registrar venta</h2>
+    <div class="sell-preview">
+      <img id="sell-img" class="sell-thumb" src="" alt="">
+      <div class="sell-meta">
+        <span id="sell-name" class="sell-name"></span>
+        <span id="sell-sub"  class="sell-sub"></span>
+        <span id="sell-price-unit" class="sell-sub" style="color:var(--amber)"></span>
+      </div>
+    </div>
+    <div class="qty-row">
+      <span class="qty-label">Cantidad</span>
+      <div class="qty-control">
+        <button class="qty-btn" id="qty-minus">−</button>
+        <input  class="qty-val" id="qty-val" type="number" value="1" min="1">
+        <button class="qty-btn" id="qty-plus">+</button>
+      </div>
+    </div>
+    <div class="sell-total-row">
+      <span class="sell-total-label">Total</span>
+      <span class="sell-total-val" id="sell-total">₡0</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="sell-cancel">Cancelar</button>
+      <button class="btn btn-amber" id="sell-confirm">Confirmar venta</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="js/store.js"></script>
+</body>
+</html>

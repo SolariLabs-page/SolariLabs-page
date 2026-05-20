@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Solarilabs | Detalle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/css/style.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="/index.html" class="logo">SOLARILABS</a>
+        <nav class="site-nav" aria-label="Principal">
+          <a href="/index.html">Catálogo</a>
+          <a href="/admin.html">Admin</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <div id="loading-state" class="loading-state">Cargando...</div>
+      <div id="error-state" class="error-state" hidden>
+        <div>
+          <p>No encontramos este producto.</p>
+          <a class="btn-secondary" href="/index.html">Volver al catálogo</a>
+        </div>
+      </div>
+
+      <section id="product-detail" hidden>
+        <p id="breadcrumb" class="breadcrumb">Inicio / Categoría / Producto</p>
+        <button class="btn-secondary" type="button" onclick="history.back()">← Volver al catálogo</button>
+
+        <div class="detail-layout">
+          <div>
+            <img id="main-image" class="gallery-main" src="" alt="">
+            <div id="thumbnails" class="thumbnails"></div>
+          </div>
+
+          <div class="product-summary">
+            <span id="product-category" class="category-label"></span>
+            <h1 id="product-name"></h1>
+            <div class="price-row">
+              <span id="product-price" class="price"></span>
+              <span id="product-compare" class="compare-price"></span>
+            </div>
+            <div id="stock-badge"></div>
+            <hr>
+            <table class="specs-table">
+              <tbody>
+                <tr><th>Marca</th><td id="spec-brand"></td></tr>
+                <tr><th>SKU</th><td id="spec-sku"></td></tr>
+                <tr><th>Color de marco</th><td id="spec-frame"></td></tr>
+                <tr><th>Color de lente</th><td id="spec-lens"></td></tr>
+                <tr><th>Material</th><td id="spec-material"></td></tr>
+                <tr><th>Protección UV</th><td id="spec-uv"></td></tr>
+                <tr><th>Polarizado</th><td id="spec-polarized"></td></tr>
+              </tbody>
+            </table>
+            <p id="product-description" class="muted"></p>
+            <div class="product-actions">
+              <a id="edit-link" class="btn-primary" href="/admin.html">✎ Editar en Admin</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/js/product.js"></script>
+  </body>
+</html>

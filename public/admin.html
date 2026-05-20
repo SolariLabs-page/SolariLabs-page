@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Solarilabs | Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="brand-lockup">
+          <a href="/index.html" class="logo">SOLARILABS</a>
+          <span class="header-title">Panel de Inventario</span>
+        </div>
+        <nav class="site-nav" aria-label="Administración">
+          <a href="/index.html">Ver tienda →</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section id="stats-grid" class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-label">Total de lentes</span>
+          <span class="stat-value" id="stat-total">—</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Unidades en stock</span>
+          <span class="stat-value" id="stat-stock">—</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Valor ₡</span>
+          <span class="stat-value" id="stat-value">—</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Stock bajo</span>
+          <span class="stat-value" id="stat-low">—</span>
+        </div>
+      </section>
+
+      <section class="table-panel">
+        <div class="table-toolbar">
+          <input id="search-table" type="search" placeholder="Buscar por nombre o SKU">
+          <button id="btn-add" class="btn-primary" type="button">＋ Agregar lente</button>
+        </div>
+        <div class="table-wrap">
+          <table id="products-table" class="admin-table">
+            <thead>
+              <tr>
+                <th>Foto</th>
+                <th>Nombre</th>
+                <th>SKU</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+        <!--
+        <tr>
+          <td><img class="thumb" src="" alt=""></td>
+          <td class="product-name"></td>
+          <td class="sku muted"></td>
+          <td><span class="category-pill"></span></td>
+          <td class="price"></td>
+          <td class="stock"></td>
+          <td><span class="status-badge"></span></td>
+          <td class="actions">
+            <button class="btn-edit" data-id="">Editar</button>
+            <button class="btn-delete" data-id="">Eliminar</button>
+          </td>
+        </tr>
+        -->
+      </section>
+    </main>
+
+    <div id="modal-product" class="modal" hidden>
+      <div id="modal-overlay" class="modal-overlay"></div>
+      <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <h2 id="modal-title">Agregar lente</h2>
+        <form id="product-form" class="form-grid">
+          <div class="form-group">
+            <h3>Información básica</h3>
+            <div class="form-row">
+              <input name="name" placeholder="Nombre del lente" required>
+              <input name="sku" placeholder="SKU (ej: SL-001)">
+            </div>
+            <div class="form-row">
+              <select name="category" required>
+                <option value="clásicos">Clásicos</option>
+                <option value="deportivos">Deportivos</option>
+                <option value="cat-eye">Cat-eye</option>
+                <option value="aviador">Aviador</option>
+                <option value="redondos">Redondos</option>
+              </select>
+              <select name="gender" required>
+                <option value="unisex">Unisex</option>
+                <option value="hombre">Hombre</option>
+                <option value="mujer">Mujer</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <h3>Precios y stock</h3>
+            <div class="form-row">
+              <input type="number" name="price" placeholder="Precio en ₡" required min="0">
+              <input type="number" name="comparePrice" placeholder="Precio comparación (opcional)" min="0">
+            </div>
+            <input type="number" name="stock" placeholder="Stock" min="0">
+          </div>
+
+          <div class="form-group">
+            <h3>Atributos</h3>
+            <div class="form-row">
+              <input name="frameColor" placeholder="Color del marco">
+              <input name="lensColor" placeholder="Color del lente">
+            </div>
+            <div class="form-row">
+              <input name="material" placeholder="Material (ej: Acetato)">
+              <input name="uvProtection" placeholder="Protección UV" value="UV400">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <h3>Opciones</h3>
+            <div class="toggle-options">
+              <label class="toggle-row"><input type="checkbox" name="polarized"> Polarizado</label>
+              <label class="toggle-row"><input type="checkbox" name="active" checked> Activo</label>
+              <label class="toggle-row"><input type="checkbox" name="featured"> Destacado</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <h3>Imagen</h3>
+            <div id="drop-zone" class="drop-zone">
+              <input type="file" name="image" accept="image/*" hidden id="file-input">
+              <div class="drop-text">Arrastrá una foto o hacé click para seleccionar</div>
+              <img id="image-preview" class="image-preview" src="" alt="Vista previa" hidden>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <h3>Descripción</h3>
+            <textarea name="description" rows="3" placeholder="Descripción del lente..."></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button id="btn-cancel" class="btn-secondary" type="button">Cancelar</button>
+            <button id="btn-save" class="btn-primary" type="submit">Guardar lente</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="modal-delete" class="modal" hidden>
+      <div id="delete-overlay" class="modal-overlay"></div>
+      <div class="modal-container" role="dialog" aria-modal="true">
+        <h2>¿Eliminar este lente?</h2>
+        <p>Vas a eliminar <strong id="delete-product-name"></strong>.</p>
+        <div class="modal-actions">
+          <button id="btn-delete-cancel" class="btn-secondary" type="button">Cancelar</button>
+          <button id="btn-delete-confirm" class="btn-danger" type="button">Sí, eliminar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="/js/admin.js"></script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "buildCommand": "echo 'static site'",
+  "outputDirectory": "public",
+  "functions": {
+    "api/**/*.js": { "memory": 512, "maxDuration": 10 }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" }
+  ]
+}

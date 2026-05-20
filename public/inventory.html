@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solarilabs · Inventario</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="brand">
+      <img src="img/SLlogo.jpg" alt="Solarilabs" class="brand-logo">
+      <span class="brand-name">Solarilabs</span>
+    </a>
+    <nav class="site-nav">
+      <a href="index.html"     class="nav-link">Tienda</a>
+      <a href="dashboard.html" class="nav-link">Ventas</a>
+      <a href="inventory.html" class="nav-link active">Inventario</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="stats-row cols-3">
+    <div class="stat-card">
+      <span class="stat-label">Productos activos</span>
+      <span class="stat-val" id="stat-products">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Unidades en stock</span>
+      <span class="stat-val" id="stat-stock">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Valor del inventario</span>
+      <span class="stat-val" id="stat-value">—</span>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="table-panel">
+      <div class="table-toolbar">
+        <input class="search-input" id="search" type="search" placeholder="Buscar por nombre o SKU…">
+        <button class="btn btn-amber" id="btn-add">+ Agregar producto</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Foto</th>
+              <th>Nombre</th>
+              <th>Marco</th>
+              <th>Lente</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="inv-body"></tbody>
+        </table>
+      </div>
+      <div id="inv-empty"   class="state-empty"   hidden>No hay productos. ¡Agrega el primero!</div>
+      <div id="inv-loading" class="state-loading">Cargando…</div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Add / Edit modal -->
+<div id="modal-product" class="modal" hidden>
+  <div class="modal-overlay" id="product-overlay"></div>
+  <div class="modal-box" style="max-width:520px">
+    <h2 id="modal-title">Agregar producto</h2>
+    <form id="product-form" class="form-grid">
+
+      <div class="field">
+        <label>Nombre del producto</label>
+        <input type="text" name="name" placeholder="Ej: Wayfarer Transparente" required>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>SKU</label>
+          <input type="text" name="sku" placeholder="SL-TR-01">
+        </div>
+        <div class="field">
+          <label>Precio (₡)</label>
+          <input type="number" name="price" placeholder="18000" required min="0">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Precio comparación (₡)</label>
+          <input type="number" name="comparePrice" placeholder="22000" min="0">
+        </div>
+        <div class="field">
+          <label>Stock inicial</label>
+          <input type="number" name="stock" placeholder="0" min="0" value="0">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Marco</label>
+        <div class="swatch-group">
+          <label class="swatch-opt">
+            <input type="radio" name="frameColor" value="negro" required>
+            <span class="swatch-btn"><span class="swatch-circle sc-negro"></span>Negro</span>
+          </label>
+          <label class="swatch-opt">
+            <input type="radio" name="frameColor" value="transparente">
+            <span class="swatch-btn"><span class="swatch-circle sc-transparente"></span>Transparente</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Color de lente</label>
+        <div class="swatch-group">
+          <label class="swatch-opt">
+            <input type="radio" name="lensColor" value="amarillo" required>
+            <span class="swatch-btn"><span class="swatch-circle sc-amarillo"></span>Amarillo — Día</span>
+          </label>
+          <label class="swatch-opt">
+            <input type="radio" name="lensColor" value="naranja">
+            <span class="swatch-btn"><span class="swatch-circle sc-naranja"></span>Naranja — Tarde</span>
+          </label>
+          <label class="swatch-opt">
+            <input type="radio" name="lensColor" value="rojo">
+            <span class="swatch-btn"><span class="swatch-circle sc-rojo"></span>Rojo — Noche</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Imagen</label>
+        <div id="drop-zone" class="drop-zone">
+          <input type="file" name="image" id="file-input" accept="image/*" hidden>
+          <div class="drop-text">Arrastrá una foto o hacé clic para seleccionar</div>
+          <img id="img-preview" src="" alt="" hidden>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Descripción (opcional)</label>
+        <textarea name="description" rows="2" placeholder="Breve descripción del producto…"></textarea>
+      </div>
+
+      <div>
+        <label class="toggle-row">
+          <input type="checkbox" name="active" checked> Producto activo
+        </label>
+      </div>
+
+      <div class="modal-actions" style="margin-top:8px">
+        <button type="button" class="btn btn-ghost" id="btn-cancel">Cancelar</button>
+        <button type="submit" class="btn btn-amber" id="btn-save">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete modal -->
+<div id="modal-delete" class="modal" hidden>
+  <div class="modal-overlay" id="delete-overlay"></div>
+  <div class="modal-box" style="max-width:380px">
+    <h2>¿Eliminar producto?</h2>
+    <p style="color:var(--muted);margin:12px 0 24px">Vas a eliminar <strong id="delete-name" style="color:var(--text)"></strong>. Esta acción no se puede deshacer.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="delete-cancel">Cancelar</button>
+      <button type="button" class="btn btn-danger-outline" id="delete-confirm">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="js/inventory.js"></script>
+</body>
+</html>

@@ -65,14 +65,10 @@ function render(list) {
             <button class="stock-adj" data-action="inc" data-id="${esc(p._id)}">+</button>
           </div>
         </td>
-        <td>
-          <span class="status-dot ${p.active ? 'status-active' : 'status-inactive'}">
-            ${p.active ? 'Activo' : 'Inactivo'}
-          </span>
-        </td>
+        <td><span class="status-dot ${p.active ? 'status-active' : 'status-inactive'}">${p.active ? 'Activo' : 'Inactivo'}</span></td>
         <td>
           <div class="row-actions">
-            <button class="btn btn-ghost btn-sm" data-action="edit"   data-id="${esc(p._id)}">Editar</button>
+            <button class="btn btn-ghost btn-sm"         data-action="edit"   data-id="${esc(p._id)}">Editar</button>
             <button class="btn btn-danger-outline btn-sm" data-action="delete" data-id="${esc(p._id)}">Eliminar</button>
           </div>
         </td>
@@ -87,12 +83,12 @@ async function adjustStock(id, delta) {
   if (!p) return
   const newStock = Math.max(0, Number(p.stock || 0) + delta)
 
-  const form = new FormData()
-  form.set('stock', newStock)
-  form.set('active', String(p.active))
-
   try {
-    const res = await fetch(`/api/products/${id}`, { method: 'PUT', body: form })
+    const res = await fetch(`/api/products/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stock: newStock, active: p.active }),
+    })
     if (!res.ok) throw new Error()
     p.stock = newStock
     render(products)
@@ -107,7 +103,6 @@ function openCreate() {
   editingId = null
   document.querySelector('#modal-title').textContent = 'Agregar producto'
   document.querySelector('#product-form').reset()
-  clearPreview()
   document.querySelector('#modal-product').hidden = false
 }
 
@@ -125,15 +120,14 @@ function openEdit(id) {
   f.elements.comparePrice.value = p.comparePrice  ?? ''
   f.elements.stock.value        = p.stock         ?? 0
   f.elements.description.value  = p.description   || ''
+  f.elements.imageUrl.value     = p.images?.[0]   || ''
   f.elements.active.checked     = p.active !== false
 
-  // Radios
   const fc = f.querySelector(`input[name="frameColor"][value="${p.frameColor}"]`)
   const lc = f.querySelector(`input[name="lensColor"][value="${p.lensColor}"]`)
   if (fc) fc.checked = true
   if (lc) lc.checked = true
 
-  showPreview(p.images?.[0] || null)
   document.querySelector('#modal-product').hidden = false
 }
 
@@ -141,10 +135,20 @@ function closeProduct() { document.querySelector('#modal-product').hidden = true
 
 async function handleFormSubmit(e) {
   e.preventDefault()
-  const f    = e.currentTarget
-  const data = new FormData(f)
-  data.set('active', f.elements.active.checked ? 'true' : 'false')
-  if (!f.elements.image.files.length) data.delete('image')
+  const f = e.currentTarget
+
+  const body = {
+    name:         f.elements.name.value.trim(),
+    sku:          f.elements.sku.value.trim()          || undefined,
+    price:        Number(f.elements.price.value),
+    comparePrice: f.elements.comparePrice.value ? Number(f.elements.comparePrice.value) : undefined,
+    frameColor:   f.querySelector('input[name="frameColor"]:checked')?.value,
+    lensColor:    f.querySelector('input[name="lensColor"]:checked')?.value,
+    stock:        Number(f.elements.stock.value) || 0,
+    description:  f.elements.description.value.trim(),
+    active:       f.elements.active.checked,
+    imageUrl:     f.elements.imageUrl.value.trim() || undefined,
+  }
 
   const btn = document.querySelector('#btn-save')
   btn.disabled = true
@@ -153,7 +157,7 @@ async function handleFormSubmit(e) {
   try {
     const res = await fetch(
       editingId ? `/api/products/${editingId}` : '/api/products',
-      { method: editingId ? 'PUT' : 'POST', body: data }
+      { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
     )
     if (!res.ok) {
       const err = await res.json().catch(() => ({}))
@@ -200,38 +204,6 @@ async function handleDelete() {
   }
 }
 
-// ── Image preview / drag-drop ─────────────────────────────────
-function setupDrop() {
-  const zone  = document.querySelector('#drop-zone')
-  const input = document.querySelector('#file-input')
-
-  zone.addEventListener('click',    () => input.click())
-  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over') })
-  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'))
-  zone.addEventListener('drop', e => {
-    e.preventDefault()
-    zone.classList.remove('drag-over')
-    const file = e.dataTransfer.files?.[0]
-    if (file) { input.files = e.dataTransfer.files; preview(file) }
-  })
-  input.addEventListener('change', () => { if (input.files[0]) preview(input.files[0]) })
-}
-
-function preview(file) {
-  const reader = new FileReader()
-  reader.onload = () => showPreview(reader.result)
-  reader.readAsDataURL(file)
-}
-
-function showPreview(src) {
-  const img  = document.querySelector('#img-preview')
-  const text = document.querySelector('.drop-text')
-  if (!src) { img.hidden = true; img.src = ''; text.hidden = false; return }
-  img.src = src; img.hidden = false; text.hidden = true
-}
-
-function clearPreview() { showPreview(null) }
-
 // ── Search ────────────────────────────────────────────────────
 function setupSearch() {
   document.querySelector('#search').addEventListener('input', e => {
@@ -272,7 +244,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadProducts()
   setupSearch()
   setupTable()
-  setupDrop()
 
   document.querySelector('#btn-add').addEventListener('click', openCreate)
   document.querySelector('#product-form').addEventListener('submit', handleFormSubmit)

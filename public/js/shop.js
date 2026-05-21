@@ -5,13 +5,38 @@ const LENS = {
   amarillo: { label: 'Día',    time: 'Uso diurno',            hex: '#c9a015', barClass: 'bar-amarillo', timingClass: 'timing-amarillo', dotClass: 'dot-amarillo' },
 }
 
+const LENS_DESC = {
+  rojo: {
+    title: 'Filtro Nocturno — Bloqueo total',
+    desc:  'Bloquean el espectro completo de luz azul. Úsalos 1–2 horas antes de dormir para que el cerebro produzca melatonina de forma natural y logres un sueño profundo y reparador.',
+    when:  '🌙 Noche · 1–2h antes de dormir',
+  },
+  naranja: {
+    title: 'Filtro Vespertino — Bloqueo alto',
+    desc:  'Reducen significativamente el impacto de las pantallas a partir de las 5pm. Preparan gradualmente tu ritmo circadiano sin afectar tu productividad en la tarde.',
+    when:  '🌅 Tarde · Desde las 5pm',
+  },
+  amarillo: {
+    title: 'Filtro Diurno — Bloqueo moderado',
+    desc:  'Ideales para uso continuo frente a pantallas durante el día. Reducen la fatiga visual y el esfuerzo ocular sin alterar tu nivel de energía ni tu ciclo de sueño.',
+    when:  '☀️ Día · Uso frente a pantallas',
+  },
+}
+
+const FRAME_NAMES = {
+  'negro':              'Marco Negro',
+  'transparente-claro': 'Marco Transparente Claro',
+  'transparente-oscuro':'Marco Transparente Oscuro',
+}
+
 const placeholder = 'data:image/svg+xml;utf8,' + encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="800" height="600" fill="#181310"/><path d="M214 318c44-46 112-46 156 0m60 0c44-46 112-46 156 0" fill="none" stroke="#d4892a" stroke-width="28" stroke-linecap="round"/><path d="M370 318h60" stroke="#d4892a" stroke-width="18" stroke-linecap="round"/></svg>'
 )
 
 // ── State ──────────────────────────────────────────────────────
-let products = []
-let filters  = { lens: '', frame: '' }
+let products            = []
+let filters             = { lens: '', frame: '' }
+let currentModalProduct = null
 
 // ── Cart helpers ───────────────────────────────────────────────
 function getCart() {
@@ -90,12 +115,7 @@ function renderProducts() {
 function shopCard(p) {
   const info  = LENS[p.lensColor] || {}
   const img   = p.images?.[0] || placeholder
-  const frameNames = {
-    'negro':              'Marco Negro',
-    'transparente-claro': 'Marco Transp. Claro',
-    'transparente-oscuro':'Marco Transp. Oscuro',
-  }
-  const frame = frameNames[p.frameColor] || (p.frameColor || '')
+  const frame = FRAME_NAMES[p.frameColor] || (p.frameColor || '')
   const stock = Number(p.stock || 0)
 
   const stockTag = stock === 0
@@ -108,7 +128,7 @@ function shopCard(p) {
   const btnLabel    = stock === 0 ? 'Sin stock' : 'Agregar al carrito'
 
   return `
-    <article class="product-card">
+    <article class="product-card" data-product-id="${esc(p._id)}">
       <div class="card-img-wrap">
         <img src="${esc(img)}" alt="${esc(p.name)}" loading="lazy">
         <div class="card-lens-bar ${info.barClass || ''}"></div>
@@ -135,6 +155,64 @@ function shopCard(p) {
       </div>
     </article>
   `
+}
+
+// ── Product detail modal ──────────────────────────────────────
+function openProductModal(product) {
+  currentModalProduct = product
+  const info  = LENS[product.lensColor]     || {}
+  const desc  = LENS_DESC[product.lensColor] || {}
+  const stock = Number(product.stock || 0)
+  const img   = product.images?.[0] || placeholder
+  const frame = FRAME_NAMES[product.frameColor] || product.frameColor || ''
+
+  // Image + lens bar
+  document.querySelector('#detail-img').src = img
+  document.querySelector('#detail-img').alt = product.name
+  const bar = document.querySelector('#detail-lens-bar')
+  bar.className = `card-lens-bar ${info.barClass || ''}`
+
+  // Timing
+  const timing = document.querySelector('#detail-timing')
+  timing.className = `card-timing ${info.timingClass || ''}`
+  timing.innerHTML = `<span class="lens-dot ${info.dotClass || ''}"></span>${esc(desc.when || info.label || '')}`
+
+  // Name + meta
+  document.querySelector('#detail-name').textContent       = product.name
+  document.querySelector('#detail-frame-lens').textContent = `${frame} · Lente ${product.lensColor || ''}`
+
+  // Lens info box
+  const infoBox = document.querySelector('#detail-lens-info')
+  infoBox.hidden = !desc.title
+  infoBox.innerHTML = desc.title ? `
+    <div class="detail-lens-box-title">${esc(desc.title)}</div>
+    <div class="detail-lens-box-desc">${esc(desc.desc)}</div>
+  ` : ''
+
+  // Description
+  const detailDesc = document.querySelector('#detail-desc')
+  detailDesc.textContent = product.description || ''
+  detailDesc.hidden = !product.description
+
+  // Price + stock
+  document.querySelector('#detail-price').textContent = formatPrice(product.price)
+  const stockEl = document.querySelector('#detail-stock')
+  if (stock === 0)     stockEl.innerHTML = '<span class="stock-tag stock-out">Sin stock</span>'
+  else if (stock < 5)  stockEl.innerHTML = `<span class="stock-tag stock-low">${stock} disp.</span>`
+  else                 stockEl.innerHTML = `<span class="stock-tag stock-ok">${stock} disponibles</span>`
+
+  // Button
+  const addBtn = document.querySelector('#modal-add-btn')
+  addBtn.disabled    = stock === 0
+  addBtn.textContent = stock === 0 ? 'Sin stock' : 'Agregar al carrito'
+  addBtn.dataset.id  = product._id
+
+  document.querySelector('#modal-product').hidden = false
+}
+
+function closeProductModal() {
+  document.querySelector('#modal-product').hidden = true
+  currentModalProduct = null
 }
 
 // ── Filters ───────────────────────────────────────────────────
@@ -210,11 +288,35 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = 'checkout.html'
   })
 
-  // Add to cart (delegated)
+  // Grid clicks — diferenciar botón "Agregar" vs. click en la card
   document.querySelector('#grid').addEventListener('click', e => {
+    // Click en botón "Agregar al carrito"
     const btn = e.target.closest('.add-to-cart-btn[data-id]')
-    if (!btn || btn.disabled) return
-    const product = products.find(p => p._id === btn.dataset.id)
-    if (product) addToCart(product)
+    if (btn) {
+      if (!btn.disabled) {
+        const product = products.find(p => p._id === btn.dataset.id)
+        if (product) addToCart(product)
+      }
+      return
+    }
+    // Click en la card → abrir modal
+    const card = e.target.closest('.product-card[data-product-id]')
+    if (card) {
+      const product = products.find(p => p._id === card.dataset.productId)
+      if (product) openProductModal(product)
+    }
+  })
+
+  // Modal — cerrar
+  document.querySelector('#product-overlay')?.addEventListener('click', closeProductModal)
+  document.querySelector('#modal-close')?.addEventListener('click', closeProductModal)
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeProductModal() })
+
+  // Modal — Agregar al carrito
+  document.querySelector('#modal-add-btn')?.addEventListener('click', () => {
+    if (currentModalProduct) {
+      addToCart(currentModalProduct)
+      closeProductModal()
+    }
   })
 })

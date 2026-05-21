@@ -79,125 +79,142 @@
 <!-- Product detail modal -->
 <div id="modal-product" class="modal" hidden>
   <div id="product-overlay" class="modal-overlay"></div>
-  <div class="modal-box" style="max-width:700px;padding:0;overflow:hidden">
-    <div class="detail-modal-layout">
-      <!-- Imagen -->
-      <div class="detail-modal-img-wrap">
-        <img id="detail-img" src="" alt="" class="detail-modal-img">
-        <div id="detail-lens-bar" class="card-lens-bar"></div>
-      </div>
-      <!-- Info -->
-      <div class="detail-modal-info">
-        <button id="modal-close" class="detail-close-btn" aria-label="Cerrar">✕</button>
-        <div id="detail-timing" class="card-timing" style="margin-bottom:10px"></div>
-        <h2 id="detail-name" class="detail-modal-name"></h2>
-        <p  id="detail-frame-lens" class="detail-modal-meta"></p>
+  <div class="modal-box detail-modal-box">
 
-        <div id="detail-lens-info" class="detail-lens-box"></div>
-
-        <p id="detail-desc" class="detail-modal-desc"></p>
-
-        <div class="detail-modal-footer">
-          <span id="detail-price" class="detail-modal-price"></span>
-          <span id="detail-stock"></span>
-        </div>
-
-        <button id="modal-add-btn" class="sell-btn" style="width:100%;margin-top:16px" data-id="">
-          Agregar al carrito
-        </button>
-      </div>
+    <!-- Imagen arriba — ocupa todo el ancho -->
+    <div class="detail-modal-img-wrap">
+      <img id="detail-img" src="" alt="" class="detail-modal-img">
+      <div id="detail-lens-bar" class="card-lens-bar"></div>
+      <button id="modal-close" class="detail-close-btn" aria-label="Cerrar">✕</button>
     </div>
+
+    <!-- Contenido debajo -->
+    <div class="detail-modal-info">
+      <div id="detail-timing" class="card-timing"></div>
+      <h2 id="detail-name"       class="detail-modal-name"></h2>
+      <p  id="detail-frame-lens" class="detail-modal-meta"></p>
+
+      <div id="detail-lens-info" class="detail-lens-box"></div>
+      <p  id="detail-desc"       class="detail-modal-desc"></p>
+
+      <div class="detail-modal-footer">
+        <span id="detail-price" class="detail-modal-price"></span>
+        <span id="detail-stock"></span>
+      </div>
+
+      <button id="modal-add-btn" class="sell-btn" style="width:100%;margin-top:4px" data-id="">
+        Agregar al carrito
+      </button>
+    </div>
+
   </div>
 </div>
 
 <div id="toast-container" class="toast-container"></div>
 
 <style>
-  /* Detail modal layout */
-  .detail-modal-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  /* ── Product detail modal ───────────────────── */
+  .detail-modal-box {
+    max-width: 460px;
+    padding: 0;
+    overflow: hidden;
+    max-height: 88vh;
+    overflow-y: auto;
   }
+
   .detail-modal-img-wrap {
     position: relative;
+    width: 100%;
+    height: 300px;
+    flex-shrink: 0;
     overflow: hidden;
   }
+
   .detail-modal-img {
     width: 100%;
     height: 100%;
-    min-height: 280px;
     object-fit: cover;
     display: block;
-    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   }
-  .detail-modal-info {
-    padding: 28px 24px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    position: relative;
-    overflow-y: auto;
-    max-height: 80vh;
-  }
+
+  /* ✕ flota sobre la esquina de la imagen */
   .detail-close-btn {
     position: absolute;
     top: 12px;
     right: 12px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
+    background: rgba(8,6,5,.65);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.18);
     border-radius: 50%;
-    color: var(--muted);
-    width: 30px;
-    height: 30px;
-    font-size: .85rem;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    font-size: .82rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color var(--tr), border-color var(--tr);
+    transition: background var(--tr);
+    z-index: 2;
   }
-  .detail-close-btn:hover { color: var(--text); border-color: var(--amber); }
+  .detail-close-btn:hover { background: rgba(212,137,42,.75); }
+
+  .detail-modal-info {
+    padding: 22px 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
   .detail-modal-name {
     font-family: "Cormorant Garamond", serif;
-    font-size: 1.75rem;
+    font-size: 2rem;
     font-weight: 600;
-    line-height: 1.1;
-    color: var(--text);
+    line-height: 1.05;
+    margin: 0;
   }
-  .detail-modal-meta { color: var(--muted); font-size: .88rem; }
-  .detail-lens-box {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px;
-  }
-  .detail-lens-box-title {
-    font-weight: 500;
-    font-size: .92rem;
-    margin-bottom: 4px;
-  }
-  .detail-lens-box-desc { color: var(--muted); font-size: .83rem; line-height: 1.5; }
-  .detail-modal-desc { color: var(--muted); font-size: .88rem; line-height: 1.55; }
+  .detail-modal-meta  { color: var(--muted); font-size: .88rem; }
+  .detail-modal-desc  { color: var(--muted); font-size: .88rem; line-height: 1.55; margin: 0; }
+
+  .detail-lens-box { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+  .detail-lens-box-title { font-weight: 500; font-size: .92rem; margin-bottom: 5px; }
+  .detail-lens-box-desc  { color: var(--muted); font-size: .83rem; line-height: 1.5; }
+
   .detail-modal-footer {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding-top: 8px;
+    padding-top: 12px;
     border-top: 1px solid var(--border);
-    margin-top: auto;
   }
   .detail-modal-price {
     font-family: "Cormorant Garamond", serif;
-    font-size: 2rem;
+    font-size: 2.1rem;
     font-weight: 600;
     color: var(--amber);
   }
-  /* Cursor pointer en cards */
+
   .product-card { cursor: pointer; }
-  @media (max-width: 600px) {
-    .detail-modal-layout { grid-template-columns: 1fr; }
-    .detail-modal-img { border-radius: var(--radius-lg) var(--radius-lg) 0 0; min-height: 220px; }
-    .detail-modal-info { max-height: none; }
+
+  /* Móvil: modal sube desde abajo como sheet */
+  @media (max-width: 520px) {
+    .detail-modal-box {
+      max-width: 100%;
+      width: 100%;
+      margin: 0;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: auto;
+      max-height: 90vh;
+    }
+    #modal-product {
+      align-items: flex-end;
+    }
+    .detail-modal-img-wrap { height: 240px; }
+    .detail-modal-img { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
   }
   .shop-header-right {
     display: flex;

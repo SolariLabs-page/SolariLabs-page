@@ -138,6 +138,9 @@ button, input, select, textarea { font: inherit; }
 
 .pwd-toggle:hover { color: var(--amber); }
 
+/* oculto en desktop, visible solo dentro del drawer móvil */
+.nav-user-section { display: none; }
+
 /* ── Hamburger button ───────────────────────────────────────── */
 .hamburger {
   display: none;
@@ -206,6 +209,7 @@ button, input, select, textarea { font: inherit; }
 
   /* user menu moves inside the drawer on mobile */
   .user-menu { display: none !important; }
+  .nav-user-section { display: flex; }
 
   .nav-user-section {
     display: flex;

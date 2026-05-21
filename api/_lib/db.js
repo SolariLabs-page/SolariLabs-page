@@ -10,7 +10,11 @@ export default async function connectDB() {
   if (cached.conn) return cached.conn
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, { bufferCommands: false })
+    cached.promise = mongoose.connect(MONGODB_URI, {
+      bufferCommands:            false,
+      serverSelectionTimeoutMS:  5000,   // falla rápido si Atlas no responde
+      connectTimeoutMS:          8000,
+    })
   }
 
   cached.conn = await cached.promise

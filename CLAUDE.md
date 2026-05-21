@@ -1,4 +1,4 @@
-# SOLARILABS — Inventory System
+# SOLARILAB — Inventory System
 > Guía de construcción dividida por agente para máxima eficiencia de tokens.
 
 ---

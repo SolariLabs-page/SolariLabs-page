@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solarilabs · Iniciar sesión</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { display:flex; align-items:center; justify-content:center; min-height:100vh; }
+
+    .login-wrap { width:100%; padding:24px; }
+
+    .login-card {
+      width: min(380px, 100%);
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 44px 36px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .login-logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    .login-brand {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 1.65rem;
+      font-weight: 600;
+      letter-spacing: 5px;
+      color: var(--amber);
+      text-transform: uppercase;
+    }
+
+    .login-sub {
+      color: var(--muted);
+      font-size: .85rem;
+      margin-bottom: 16px;
+    }
+
+    .login-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .login-error {
+      color: var(--danger);
+      font-size: .85rem;
+      text-align: center;
+      padding: 8px;
+      background: rgba(192,48,48,.08);
+      border-radius: var(--radius);
+      border: 1px solid rgba(192,48,48,.25);
+    }
+  </style>
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <img src="img/SLlogo.jpg" alt="Solarilabs" class="login-logo">
+      <span class="login-brand">Solarilabs</span>
+      <span class="login-sub">Panel de administración</span>
+
+      <form class="login-form" id="login-form">
+        <div class="field">
+          <label>Contraseña</label>
+          <input type="password" id="password" placeholder="••••••••" required autofocus>
+        </div>
+        <div class="login-error" id="login-error" hidden></div>
+        <button type="submit" class="btn btn-amber" style="width:100%;margin-top:4px" id="login-btn">
+          Entrar
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Si ya hay sesión activa, ir directo al panel
+    if (localStorage.getItem('sl_token')) window.location.replace('index.html')
+
+    document.querySelector('#login-form').addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const btn   = document.querySelector('#login-btn')
+      const error = document.querySelector('#login-error')
+      const pwd   = document.querySelector('#password').value
+
+      btn.disabled = true
+      btn.textContent = 'Entrando…'
+      error.hidden = true
+
+      try {
+        const res  = await fetch('/api/auth/login', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ password: pwd }),
+        })
+        const data = await res.json()
+
+        if (!res.ok) throw new Error(data.error || 'Error al iniciar sesión')
+
+        localStorage.setItem('sl_token', data.token)
+        window.location.replace('index.html')
+      } catch (err) {
+        error.textContent = err.message
+        error.hidden = false
+        btn.disabled = false
+        btn.textContent = 'Entrar'
+      }
+    })
+  </script>
+</body>
+</html>

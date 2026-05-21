@@ -100,16 +100,18 @@ function setupShippingOptions() {
   const optEls   = document.querySelectorAll('.shipping-option')
   const locWrap  = document.querySelector('#location-wrap')
 
+  const addrWrap = document.querySelector('#address-wrap')
+
   radios.forEach(radio => {
     radio.addEventListener('change', () => {
       optEls.forEach(el => el.classList.remove('selected'))
       const parent = radio.closest('.shipping-option')
       if (parent) parent.classList.add('selected')
 
-      // Show location button only for delivery options (uber-rappi)
-      if (locWrap) {
-        locWrap.hidden = radio.value !== 'uber-rappi'
-      }
+      // Correos → campo de dirección
+      if (addrWrap) addrWrap.hidden = radio.value !== 'correos'
+      // Uber/Rappi → botón de ubicación GPS
+      if (locWrap)  locWrap.hidden  = radio.value !== 'uber-rappi'
     })
   })
 }
@@ -153,33 +155,39 @@ function setupLocationBtn() {
 function buildWhatsAppMessage(order, customer) {
   const cart    = order.items || []
   const total   = cart.reduce((s, i) => s + (i.price || 0) * (i.quantity || 1), 0)
-  const orderId = order._id || order.id || '—'
+  const ref     = (order._id || order.id || '').slice(-6).toUpperCase()
 
   const itemLines = cart.map(item => {
     const subtotal = (item.price || 0) * (item.quantity || 1)
-    return `• ${item.name} × ${item.quantity || 1} — ${formatPrice(subtotal)}`
+    return `  • ${item.name} x${item.quantity || 1}  ${formatPrice(subtotal)}`
   }).join('\n')
 
-  const shippingLabel = SHIPPING_NAMES[order.shipping?.method] || order.shipping?.method || '—'
-  const locationLine  = (locationLat && locationLng)
-    ? `\n📍 Ubicación: https://maps.google.com/?q=${locationLat},${locationLng}`
-    : ''
-  const notesLine = order.notes ? `\n📝 Nota: ${order.notes}` : ''
+  const shippingLabel = SHIPPING_NAMES[order.shipping?.method] || '—'
+  const address       = order.shipping?.address
+  const hasLocation   = locationLat && locationLng
 
-  const msg = `🛒 *NUEVO PEDIDO - SolariLab*
+  let envioLine = `Envío: ${shippingLabel}`
+  if (address)     envioLine += `\nDirección: ${address}`
+  if (hasLocation) envioLine += `\nUbicación: https://maps.google.com/?q=${locationLat},${locationLng}`
 
-👤 *Cliente:* ${customer.name} (${customer.email})
+  const notesLine = order.notes ? `\nNota: ${order.notes}` : ''
 
-📦 *Productos:*
-${itemLines}
-
-💰 *Total:* ${formatPrice(total)}
-
-🚚 *Envío:* ${shippingLabel}${locationLine}${notesLine}
-
-🆔 Pedido #${orderId}`
-
-  return msg
+  return [
+    `Nuevo pedido SolariLab`,
+    ``,
+    `Cliente: ${customer.name}`,
+    `Correo: ${customer.email}`,
+    ``,
+    `Productos:`,
+    itemLines,
+    ``,
+    `Total: ${formatPrice(total)}`,
+    ``,
+    envioLine,
+    notesLine,
+    ``,
+    `Ref: ${ref}`,
+  ].filter(l => l !== null).join('\n')
 }
 
 // ── Handle checkout submit ────────────────────────────────────
@@ -199,6 +207,11 @@ async function handleCheckout() {
   const notes          = document.querySelector('#notes')?.value?.trim() || ''
 
   const shipping = { method: shippingMethod }
+  if (shippingMethod === 'correos') {
+    const addr = document.querySelector('#shipping-address')?.value?.trim()
+    if (!addr) { showToast('error', 'Ingresá la dirección de entrega'); return }
+    shipping.address = addr
+  }
   if (locationLat && locationLng) {
     shipping.lat = locationLat
     shipping.lng = locationLng

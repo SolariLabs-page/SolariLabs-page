@@ -10,7 +10,7 @@ export async function uploadImage(base64DataUri) {
   }
 
   const timestamp = Math.floor(Date.now() / 1000)
-  const folder    = 'solarilabs'
+  const folder    = 'SOLARILAB'
 
   const signature = createHash('sha1')
     .update(`folder=${folder}&timestamp=${timestamp}${apiSecret}`)

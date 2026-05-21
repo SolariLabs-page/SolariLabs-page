@@ -905,6 +905,8 @@ button, input, select, textarea { font: inherit; }
 input[type="text"],
 input[type="number"],
 input[type="search"],
+input[type="email"],
+input[type="password"],
 select,
 textarea {
   width: 100%;
@@ -1061,4 +1063,127 @@ textarea { resize: vertical; }
   .form-row { grid-template-columns: 1fr; }
   .modal-actions { flex-direction: column-reverse; }
   .nav-link { padding: 7px 10px; font-size: 0.8rem; }
+}
+
+/* ── Shop cart button ───── */
+.cart-btn {
+  position: relative;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: 8px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: border-color var(--tr);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.cart-btn:hover { border-color: var(--amber); }
+.cart-count {
+  background: var(--amber);
+  color: #080605;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 1px 7px;
+  min-width: 20px;
+  text-align: center;
+}
+.cart-count[data-count="0"] { display: none; }
+
+/* ── Checkout ───────────── */
+.checkout-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 32px;
+  padding: 36px 0;
+  align-items: start;
+}
+.checkout-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+.checkout-card h3 {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.4rem;
+  margin-bottom: 16px;
+}
+.order-item {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.order-item:last-child { border-bottom: none; }
+.order-thumb {
+  width: 64px;
+  height: 48px;
+  border-radius: var(--radius);
+  object-fit: cover;
+  background: var(--surface2);
+  flex-shrink: 0;
+}
+.order-item-info { flex: 1; }
+.order-item-name { font-weight: 500; font-size: 0.95rem; }
+.order-item-meta { color: var(--muted); font-size: 0.82rem; }
+.order-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.order-total-val {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 2rem;
+  color: var(--amber);
+}
+.shipping-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color var(--tr), background var(--tr);
+  margin-bottom: 10px;
+}
+.shipping-option:hover { border-color: var(--amber); }
+.shipping-option input[type="radio"] { margin-top: 2px; accent-color: var(--amber); }
+.shipping-option.selected { border-color: var(--amber); background: var(--amber-dim); }
+.shipping-label { font-weight: 500; font-size: 0.95rem; }
+.shipping-desc { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+.location-btn-wrap { margin: 12px 0; }
+#location-status { font-size: 0.85rem; margin-top: 6px; color: var(--muted); }
+
+/* ── Order status badges ─── */
+.status-pendiente  { border-color: rgba(201,160,21,.4);  color: var(--yellow);  }
+.status-confirmado { border-color: rgba(59,130,246,.4);  color: #60a5fa;        }
+.status-en-proceso { border-color: rgba(217,96,32,.4);   color: var(--orange);  }
+.status-enviado    { border-color: rgba(139,92,246,.4);  color: #a78bfa;        }
+.status-entregado  { border-color: rgba(58,158,96,.4);   color: var(--success); }
+.status-cancelado  { border-color: rgba(200,48,48,.4);   color: var(--danger);  }
+
+.status-select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  outline: none;
+}
+.status-select:focus { border-color: var(--amber); }
+
+@media (max-width: 768px) {
+  .checkout-layout { grid-template-columns: 1fr; }
 }

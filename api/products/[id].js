@@ -9,8 +9,11 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization')
   if (req.method === 'OPTIONS') return res.status(200).end()
 
-  const user = await requireAuth(req, res)
-  if (!user) return
+  // GET es público
+  if (req.method !== 'GET') {
+    const user = await requireAuth(req, res)
+    if (!user) return
+  }
 
   try {
     await connectDB()
@@ -35,8 +38,10 @@ export default async function handler(req, res) {
       if (body.description !== undefined) updates.description = body.description
       if (body.active      !== undefined) updates.active      = body.active
 
-      // Nueva imagen — Cloudinary tiene prioridad sobre URL manual
       if (body.imageBase64) {
+        if (body.imageBase64.length > 6_000_000) {
+          return res.status(400).json({ error: 'La imagen no puede superar 4MB' })
+        }
         updates.images = [await uploadImage(body.imageBase64)]
       } else if (body.imageUrl !== undefined) {
         updates.images = body.imageUrl ? [body.imageUrl] : []

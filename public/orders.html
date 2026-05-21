@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solarilab · Pedidos</title>
+  <link rel="icon" type="image/jpeg" href="img/SLlogo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="orders.html" class="brand">
+      <img src="img/SLlogo.jpg" alt="Solarilab" class="brand-logo">
+      <span class="brand-name">SOLARILAB</span>
+    </a>
+    <nav class="site-nav">
+      <a href="orders.html"    class="nav-link active">Pedidos</a>
+      <a href="dashboard.html" class="nav-link">Ventas</a>
+      <a href="inventory.html" class="nav-link">Inventario</a>
+      <a href="crm.html"       class="nav-link">CRM</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- Status filter tabs -->
+  <div style="display:flex;flex-wrap:wrap;gap:8px;padding:28px 0 0">
+    <button class="pill active" data-status="">Todos</button>
+    <button class="pill" data-status="pendiente">Pendiente</button>
+    <button class="pill" data-status="confirmado">Confirmado</button>
+    <button class="pill" data-status="en-proceso">En proceso</button>
+    <button class="pill" data-status="enviado">Enviado</button>
+    <button class="pill" data-status="entregado">Entregado</button>
+    <button class="pill" data-status="cancelado">Cancelado</button>
+  </div>
+
+  <section class="section">
+    <div class="table-panel">
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Pedido</th>
+              <th>Fecha</th>
+              <th>Cliente</th>
+              <th>Productos</th>
+              <th>Envío</th>
+              <th>Total</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="orders-body"></tbody>
+        </table>
+      </div>
+      <div id="orders-empty"   class="state-empty"   hidden>No hay pedidos todavía.</div>
+      <div id="orders-loading" class="state-loading">Cargando…</div>
+    </div>
+  </section>
+
+</main>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="js/auth.js"></script>
+<script src="js/orders.js"></script>
+</body>
+</html>

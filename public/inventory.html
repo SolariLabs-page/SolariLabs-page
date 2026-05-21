@@ -133,8 +133,13 @@
       </div>
 
       <div class="field">
-        <label>URL de imagen (opcional)</label>
-        <input type="text" name="imageUrl" placeholder="https://... o /img/Negro-Rojo.PNG">
+        <label>Imagen del producto</label>
+        <div id="drop-zone" class="drop-zone">
+          <input type="file" id="file-input" accept="image/*" hidden>
+          <div class="drop-text">Arrastrá una foto o hacé clic para seleccionar</div>
+          <img id="img-preview" src="" alt="Vista previa" hidden style="max-height:200px;width:100%;object-fit:cover;border-radius:var(--radius)">
+        </div>
+        <input type="text" id="image-url-input" name="imageUrl" placeholder="O pegá una URL de imagen (opcional)" style="margin-top:8px">
       </div>
 
       <div class="field">

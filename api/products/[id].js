@@ -1,6 +1,7 @@
 import connectDB from '../_lib/db.js'
 import Product from '../_lib/Product.js'
 import { requireAuth } from '../_lib/auth.js'
+import { uploadImage } from '../_lib/cloudinary.js'
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -22,19 +23,24 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'PUT') {
-      const body = req.body || {}
+      const body    = req.body || {}
       const updates = {}
 
-      if (body.name         !== undefined) updates.name         = body.name
-      if (body.sku          !== undefined) updates.sku          = body.sku || undefined
-      if (body.price        !== undefined) updates.price        = Number(body.price)
-      if (body.comparePrice !== undefined) updates.comparePrice = body.comparePrice ? Number(body.comparePrice) : undefined
-      if (body.frameColor   !== undefined) updates.frameColor   = body.frameColor
-      if (body.lensColor    !== undefined) updates.lensColor    = body.lensColor
-      if (body.stock        !== undefined) updates.stock        = Number(body.stock)
-      if (body.description  !== undefined) updates.description  = body.description
-      if (body.active       !== undefined) updates.active       = body.active
-      if (body.imageUrl     !== undefined) updates.images       = body.imageUrl ? [body.imageUrl] : []
+      if (body.name        !== undefined) updates.name        = body.name
+      if (body.sku         !== undefined) updates.sku         = body.sku || undefined
+      if (body.price       !== undefined) updates.price       = Number(body.price)
+      if (body.frameColor  !== undefined) updates.frameColor  = body.frameColor
+      if (body.lensColor   !== undefined) updates.lensColor   = body.lensColor
+      if (body.stock       !== undefined) updates.stock       = Number(body.stock)
+      if (body.description !== undefined) updates.description = body.description
+      if (body.active      !== undefined) updates.active      = body.active
+
+      // Nueva imagen — Cloudinary tiene prioridad sobre URL manual
+      if (body.imageBase64) {
+        updates.images = [await uploadImage(body.imageBase64)]
+      } else if (body.imageUrl !== undefined) {
+        updates.images = body.imageUrl ? [body.imageUrl] : []
+      }
 
       const product = await Product.findByIdAndUpdate(id, updates, { new: true })
       if (!product) return res.status(404).json({ error: 'Product not found' })

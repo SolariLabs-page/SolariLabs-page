@@ -99,10 +99,14 @@ async function adjustStock(id, delta) {
 }
 
 // ── Add / Edit modal ──────────────────────────────────────────
+let pendingBase64 = null   // imagen seleccionada pero no guardada aún
+
 function openCreate() {
   editingId = null
+  pendingBase64 = null
   document.querySelector('#modal-title').textContent = 'Agregar producto'
   document.querySelector('#product-form').reset()
+  clearImagePreview()
   document.querySelector('#modal-product').hidden = false
 }
 
@@ -118,14 +122,18 @@ function openEdit(id) {
   f.elements.sku.value          = p.sku    || ''
   f.elements.price.value        = p.price  ?? ''
   f.elements.stock.value        = p.stock  ?? 0
-  f.elements.description.value  = p.description   || ''
-  f.elements.imageUrl.value     = p.images?.[0]   || ''
-  f.elements.active.checked     = p.active !== false
+  f.elements.description.value = p.description || ''
+  f.elements.active.checked    = p.active !== false
 
   const fc = f.querySelector(`input[name="frameColor"][value="${p.frameColor}"]`)
   const lc = f.querySelector(`input[name="lensColor"][value="${p.lensColor}"]`)
   if (fc) fc.checked = true
   if (lc) lc.checked = true
+
+  pendingBase64 = null
+  const existingImg = p.images?.[0] || ''
+  showImagePreview(existingImg)
+  document.querySelector('#image-url-input').value = existingImg
 
   document.querySelector('#modal-product').hidden = false
 }
@@ -137,15 +145,22 @@ async function handleFormSubmit(e) {
   const f = e.currentTarget
 
   const body = {
-    name:         f.elements.name.value.trim(),
-    sku:          f.elements.sku.value.trim() || undefined,
-    price:        Number(f.elements.price.value),
-    frameColor:   f.querySelector('input[name="frameColor"]:checked')?.value,
-    lensColor:    f.querySelector('input[name="lensColor"]:checked')?.value,
-    stock:        Number(f.elements.stock.value) || 0,
-    description:  f.elements.description.value.trim(),
-    active:       f.elements.active.checked,
-    imageUrl:     f.elements.imageUrl.value.trim() || undefined,
+    name:        f.elements.name.value.trim(),
+    sku:         f.elements.sku.value.trim() || undefined,
+    price:       Number(f.elements.price.value),
+    frameColor:  f.querySelector('input[name="frameColor"]:checked')?.value,
+    lensColor:   f.querySelector('input[name="lensColor"]:checked')?.value,
+    stock:       Number(f.elements.stock.value) || 0,
+    description: f.elements.description.value.trim(),
+    active:      f.elements.active.checked,
+  }
+
+  // Imagen: base64 tiene prioridad sobre URL manual
+  if (pendingBase64) {
+    body.imageBase64 = pendingBase64
+  } else {
+    const urlVal = document.querySelector('#image-url-input').value.trim()
+    if (urlVal) body.imageUrl = urlVal
   }
 
   const btn = document.querySelector('#btn-save')
@@ -202,6 +217,78 @@ async function handleDelete() {
   }
 }
 
+// ── Image preview & drag-drop ─────────────────────────────────
+function showImagePreview(src) {
+  const preview  = document.querySelector('#img-preview')
+  const dropText = document.querySelector('.drop-text')
+  if (src) {
+    preview.src    = src
+    preview.hidden = false
+    if (dropText) dropText.hidden = true
+  } else {
+    preview.src    = ''
+    preview.hidden = true
+    if (dropText) dropText.hidden = false
+  }
+}
+
+function clearImagePreview() {
+  pendingBase64 = null
+  showImagePreview(null)
+  const urlInput = document.querySelector('#image-url-input')
+  if (urlInput) urlInput.value = ''
+}
+
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    if (file.size > 4 * 1024 * 1024) {
+      reject(new Error('La imagen no puede superar 4MB'))
+      return
+    }
+    const reader = new FileReader()
+    reader.onload  = () => resolve(reader.result)
+    reader.onerror = () => reject(new Error('Error leyendo el archivo'))
+    reader.readAsDataURL(file)
+  })
+}
+
+function setupDrop() {
+  const zone  = document.querySelector('#drop-zone')
+  const input = document.querySelector('#file-input')
+  if (!zone || !input) return
+
+  zone.addEventListener('click', () => input.click())
+
+  zone.addEventListener('dragover', e => {
+    e.preventDefault()
+    zone.classList.add('drag-over')
+  })
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'))
+
+  zone.addEventListener('drop', async e => {
+    e.preventDefault()
+    zone.classList.remove('drag-over')
+    const file = e.dataTransfer.files?.[0]
+    if (file) await processFile(file)
+  })
+
+  input.addEventListener('change', async () => {
+    const file = input.files?.[0]
+    if (file) await processFile(file)
+  })
+
+  async function processFile(file) {
+    try {
+      const base64 = await readFileAsBase64(file)
+      pendingBase64 = base64
+      showImagePreview(base64)
+      document.querySelector('#image-url-input').value = ''
+    } catch (err) {
+      showToast('error', err.message)
+    }
+  }
+}
+
 // ── Search ────────────────────────────────────────────────────
 function setupSearch() {
   document.querySelector('#search').addEventListener('input', e => {
@@ -242,6 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadProducts()
   setupSearch()
   setupTable()
+  setupDrop()
 
   document.querySelector('#btn-add').addEventListener('click', openCreate)
   document.querySelector('#product-form').addEventListener('submit', handleFormSubmit)

@@ -1,6 +1,7 @@
 import connectDB from '../_lib/db.js'
 import Product from '../_lib/Product.js'
 import { requireAuth } from '../_lib/auth.js'
+import { uploadImage } from '../_lib/cloudinary.js'
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -33,17 +34,23 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
       const body = req.body || {}
+
+      // Subir imagen a Cloudinary si viene en base64
+      let imageUrl = body.imageUrl || ''
+      if (body.imageBase64) {
+        imageUrl = await uploadImage(body.imageBase64)
+      }
+
       const data = {
-        name:         body.name,
-        sku:          body.sku      || undefined,
-        price:        Number(body.price),
-        comparePrice: body.comparePrice ? Number(body.comparePrice) : undefined,
-        frameColor:   body.frameColor,
-        lensColor:    body.lensColor,
-        stock:        Number(body.stock) || 0,
-        description:  body.description,
-        active:       body.active !== false,
-        images:       body.imageUrl ? [body.imageUrl] : [],
+        name:        body.name,
+        sku:         body.sku       || undefined,
+        price:       Number(body.price),
+        frameColor:  body.frameColor,
+        lensColor:   body.lensColor,
+        stock:       Number(body.stock) || 0,
+        description: body.description,
+        active:      body.active !== false,
+        images:      imageUrl ? [imageUrl] : [],
       }
 
       const product = await Product.create(data)

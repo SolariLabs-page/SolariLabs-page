@@ -108,9 +108,13 @@
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ password: pwd }),
         })
-        const data = await res.json()
 
-        if (!res.ok) throw new Error(data.error || 'Error al iniciar sesión')
+        // Parsear con seguridad — si el servidor devuelve error HTML no explota
+        const text = await res.text()
+        let data = {}
+        try { data = JSON.parse(text) } catch { /* respuesta no-JSON del servidor */ }
+
+        if (!res.ok) throw new Error(data.error || `Error del servidor (${res.status})`)
 
         localStorage.setItem('sl_token', data.token)
         window.location.replace('index.html')

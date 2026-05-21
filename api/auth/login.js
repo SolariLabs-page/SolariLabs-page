@@ -1,14 +1,17 @@
-import { pbkdf2Sync, randomBytes } from 'crypto'
+import { pbkdf2, randomBytes } from 'crypto'
+import { promisify } from 'util'
 import connectDB from '../_lib/db.js'
 import User from '../_lib/User.js'
 
+const pbkdf2Async = promisify(pbkdf2)
 const DEFAULT_PASSWORD = 'Solari2025!'
-const ITERATIONS = 100000
+const ITERATIONS = 1000
 const KEYLEN     = 64
 const DIGEST     = 'sha512'
 
-function hashPwd(password, salt) {
-  return pbkdf2Sync(password, salt, ITERATIONS, KEYLEN, DIGEST).toString('hex')
+async function hashPwd(password, salt) {
+  const buf = await pbkdf2Async(password, salt, ITERATIONS, KEYLEN, DIGEST)
+  return buf.toString('hex')
 }
 
 export default async function handler(req, res) {
@@ -29,19 +32,19 @@ export default async function handler(req, res) {
     // Primera vez: crear usuario con contraseña default
     if (!user) {
       const salt = randomBytes(16).toString('hex')
-      const hash = hashPwd(DEFAULT_PASSWORD, salt)
+      const hash = await hashPwd(DEFAULT_PASSWORD, salt)
       user = await User.create({ passwordHash: hash, passwordSalt: salt })
     }
 
     // Verificar contraseña
-    const attempt = hashPwd(password, user.passwordSalt)
+    const attempt = await hashPwd(password, user.passwordSalt)
     if (attempt !== user.passwordHash) {
       return res.status(401).json({ error: 'Contraseña incorrecta' })
     }
 
-    // Generar token
-    const token   = randomBytes(32).toString('hex')
-    const expiry  = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    // Generar token (30 días)
+    const token  = randomBytes(32).toString('hex')
+    const expiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     user.sessionToken = token
     user.tokenExpiry  = expiry
     await user.save()

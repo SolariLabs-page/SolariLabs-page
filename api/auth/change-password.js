@@ -1,12 +1,15 @@
-import { pbkdf2Sync, randomBytes } from 'crypto'
+import { pbkdf2, randomBytes } from 'crypto'
+import { promisify } from 'util'
 import { requireAuth } from '../_lib/auth.js'
 
-const ITERATIONS = 100000
-const KEYLEN     = 64
-const DIGEST     = 'sha512'
+const pbkdf2Async = promisify(pbkdf2)
+const ITERATIONS  = 1000
+const KEYLEN      = 64
+const DIGEST      = 'sha512'
 
-function hashPwd(password, salt) {
-  return pbkdf2Sync(password, salt, ITERATIONS, KEYLEN, DIGEST).toString('hex')
+async function hashPwd(password, salt) {
+  const buf = await pbkdf2Async(password, salt, ITERATIONS, KEYLEN, DIGEST)
+  return buf.toString('hex')
 }
 
 export default async function handler(req, res) {
@@ -30,16 +33,14 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'La nueva contraseña debe tener al menos 6 caracteres' })
     }
 
-    // Verificar contraseña actual
-    const attempt = hashPwd(currentPassword, user.passwordSalt)
+    const attempt = await hashPwd(currentPassword, user.passwordSalt)
     if (attempt !== user.passwordHash) {
       return res.status(401).json({ error: 'Contraseña actual incorrecta' })
     }
 
-    // Guardar nueva contraseña
-    const newSalt = randomBytes(16).toString('hex')
-    user.passwordHash = hashPwd(newPassword, newSalt)
-    user.passwordSalt = newSalt
+    const newSalt         = randomBytes(16).toString('hex')
+    user.passwordHash     = await hashPwd(newPassword, newSalt)
+    user.passwordSalt     = newSalt
     await user.save()
 
     return res.status(200).json({ success: true })

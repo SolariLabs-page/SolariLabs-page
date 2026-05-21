@@ -114,11 +114,10 @@ function openEdit(id) {
   document.querySelector('#modal-title').textContent = 'Editar producto'
   const f = document.querySelector('#product-form')
   f.reset()
-  f.elements.name.value         = p.name         || ''
-  f.elements.sku.value          = p.sku           || ''
-  f.elements.price.value        = p.price         ?? ''
-  f.elements.comparePrice.value = p.comparePrice  ?? ''
-  f.elements.stock.value        = p.stock         ?? 0
+  f.elements.name.value         = p.name   || ''
+  f.elements.sku.value          = p.sku    || ''
+  f.elements.price.value        = p.price  ?? ''
+  f.elements.stock.value        = p.stock  ?? 0
   f.elements.description.value  = p.description   || ''
   f.elements.imageUrl.value     = p.images?.[0]   || ''
   f.elements.active.checked     = p.active !== false
@@ -139,9 +138,8 @@ async function handleFormSubmit(e) {
 
   const body = {
     name:         f.elements.name.value.trim(),
-    sku:          f.elements.sku.value.trim()          || undefined,
+    sku:          f.elements.sku.value.trim() || undefined,
     price:        Number(f.elements.price.value),
-    comparePrice: f.elements.comparePrice.value ? Number(f.elements.comparePrice.value) : undefined,
     frameColor:   f.querySelector('input[name="frameColor"]:checked')?.value,
     lensColor:    f.querySelector('input[name="lensColor"]:checked')?.value,
     stock:        Number(f.elements.stock.value) || 0,

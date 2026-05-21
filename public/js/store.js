@@ -48,7 +48,8 @@ function render() {
 function card(p) {
   const info  = LENS[p.lensColor] || {}
   const img   = p.images?.[0] || placeholder
-  const frame = p.frameColor === 'transparente-claro' ? 'Marco Transp. Claro' : 'Marco Transp. Oscuro'
+  const frameNames = { 'negro': 'Marco Negro', 'transparente-claro': 'Marco Transp. Claro', 'transparente-oscuro': 'Marco Transp. Oscuro' }
+  const frame = frameNames[p.frameColor] || p.frameColor
   const stock = Number(p.stock || 0)
 
   const stockTag = stock === 0

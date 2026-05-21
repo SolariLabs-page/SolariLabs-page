@@ -54,6 +54,8 @@ button, input, select, textarea { font: inherit; }
   background: rgba(8,6,5,.92);
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(20px);
+  /* needed for absolute-positioned mobile nav */
+  overflow: visible;
 }
 
 .header-inner {
@@ -106,6 +108,101 @@ button, input, select, textarea { font: inherit; }
 
 .nav-link:hover { color: var(--text); background: var(--surface); }
 .nav-link.active { color: var(--amber); background: var(--amber-dim); }
+
+/* ── Hamburger button ───────────────────────────────────────── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 42px;
+  height: 42px;
+  padding: 9px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color var(--tr);
+}
+
+.hamburger:hover { border-color: var(--amber); }
+
+.hamburger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: transform 240ms ease, opacity 240ms ease;
+}
+
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ── Mobile nav drawer ──────────────────────────────────────── */
+@media (max-width: 640px) {
+  .hamburger { display: flex; }
+
+  .site-header { position: sticky; }
+
+  .site-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 0 12px;
+    z-index: 198;
+    box-shadow: 0 12px 32px rgba(0,0,0,.5);
+  }
+
+  .site-nav.open { display: flex; }
+
+  .nav-link {
+    padding: 15px 24px;
+    border-radius: 0;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-link:last-of-type { border-bottom: none; }
+
+  /* user menu moves inside the drawer on mobile */
+  .user-menu { display: none !important; }
+
+  .nav-user-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+  }
+
+  .nav-user-btn {
+    padding: 13px 24px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: left;
+    cursor: pointer;
+    transition: color var(--tr), background var(--tr);
+    font-family: inherit;
+  }
+
+  .nav-user-btn:hover { color: var(--text); background: var(--surface2); }
+  .nav-user-btn.danger { color: var(--danger); }
+  .nav-user-btn.danger:hover { background: rgba(192,48,48,.1); }
+}
 
 /* ── Hero ───────────────────────────────────────────────────── */
 .hero {

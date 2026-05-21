@@ -35,10 +35,12 @@
   }
 })()
 
-// ── UI: menú de usuario + modal de contraseña ────────────────
+// ── UI: hamburger + menú de usuario + modal de contraseña ────
 document.addEventListener('DOMContentLoaded', () => {
-  // Inyectar menú de usuario en el header
   const headerInner = document.querySelector('.header-inner')
+  const siteNav     = document.querySelector('.site-nav')
+
+  // ── Menú de usuario (desktop) ────────────────────────────
   if (headerInner) {
     const menu = document.createElement('div')
     menu.className = 'user-menu'
@@ -50,8 +52,66 @@ document.addEventListener('DOMContentLoaded', () => {
     headerInner.appendChild(menu)
   }
 
-  // Inyectar modal cambio de contraseña
-  const modalHtml = `
+  // ── Hamburger + opciones de usuario en el nav móvil ──────
+  if (headerInner && siteNav) {
+    // Inyectar botones de usuario al final del nav (visibles solo en móvil vía CSS)
+    const userSection = document.createElement('div')
+    userSection.className = 'nav-user-section'
+    userSection.innerHTML = `
+      <button class="nav-user-btn" id="nav-change-pwd" type="button">⚙ Cambiar contraseña</button>
+      <button class="nav-user-btn danger" id="nav-logout" type="button">Salir</button>
+    `
+    siteNav.appendChild(userSection)
+
+    // Inyectar botón hamburger
+    const hamburger = document.createElement('button')
+    hamburger.className = 'hamburger'
+    hamburger.id = 'hamburger-btn'
+    hamburger.setAttribute('aria-label', 'Menú')
+    hamburger.setAttribute('aria-expanded', 'false')
+    hamburger.innerHTML = '<span></span><span></span><span></span>'
+    headerInner.insertBefore(hamburger, headerInner.querySelector('.user-menu'))
+
+    // Toggle
+    function openNav() {
+      siteNav.classList.add('open')
+      hamburger.classList.add('open')
+      hamburger.setAttribute('aria-expanded', 'true')
+    }
+
+    function closeNav() {
+      siteNav.classList.remove('open')
+      hamburger.classList.remove('open')
+      hamburger.setAttribute('aria-expanded', 'false')
+    }
+
+    hamburger.addEventListener('click', () => {
+      siteNav.classList.contains('open') ? closeNav() : openNav()
+    })
+
+    // Cerrar al hacer click en un link de nav
+    siteNav.querySelectorAll('.nav-link').forEach(link =>
+      link.addEventListener('click', closeNav)
+    )
+
+    // Cerrar al hacer click fuera
+    document.addEventListener('click', e => {
+      if (!headerInner.contains(e.target)) closeNav()
+    })
+
+    // Botones de usuario en el drawer móvil
+    document.querySelector('#nav-change-pwd')?.addEventListener('click', () => {
+      closeNav()
+      openChangePwd()
+    })
+    document.querySelector('#nav-logout')?.addEventListener('click', () => {
+      closeNav()
+      handleLogout()
+    })
+  }
+
+  // ── Modal cambio de contraseña ────────────────────────────
+  document.body.insertAdjacentHTML('beforeend', `
     <div id="modal-changepwd" class="modal" hidden>
       <div class="modal-overlay" id="changepwd-overlay"></div>
       <div class="modal-box" style="max-width:380px">
@@ -77,8 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </form>
       </div>
     </div>
-  `
-  document.body.insertAdjacentHTML('beforeend', modalHtml)
+  `)
 
   // ── Handlers ──────────────────────────────────────────────
   function openChangePwd() {
@@ -92,9 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function handleLogout() {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' })
-    } catch { /* ignorar errores de red */ }
+    try { await fetch('/api/auth/logout', { method: 'POST' }) } catch { /* red */ }
     localStorage.removeItem('sl_token')
     window.location.replace('login.html')
   }
@@ -121,14 +178,12 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.textContent = 'Guardando…'
 
     try {
-      const res = await fetch('/api/auth/change-password', {
+      const res  = await fetch('/api/auth/change-password', {
         method: 'PUT',
         body: JSON.stringify({ currentPassword, newPassword }),
       })
       const data = await res.json()
-
       if (!res.ok) throw new Error(data.error || 'Error al cambiar contraseña')
-
       closeChangePwd()
       showAuthToast('success', 'Contraseña actualizada correctamente')
     } catch (err) {
@@ -140,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Eventos
+  // Eventos desktop
   document.querySelector('#btn-logout')?.addEventListener('click', handleLogout)
   document.querySelector('#btn-change-pwd')?.addEventListener('click', openChangePwd)
   document.querySelector('#changepwd-cancel')?.addEventListener('click', closeChangePwd)
@@ -148,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#changepwd-form')?.addEventListener('submit', handleChangePwd)
 })
 
-// ── Toast helper (funciona aunque toast-container no exista aún) ──
+// ── Toast helper ──────────────────────────────────────────────
 function showAuthToast(type, msg) {
   const container = document.querySelector('#toast-container')
   if (!container) return

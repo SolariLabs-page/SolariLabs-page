@@ -1,22 +1,16 @@
 import mongoose from 'mongoose'
 
-const MONGODB_URI = process.env.MONGODB_URI
-
-if (!MONGODB_URI) throw new Error('MONGODB_URI is not defined')
-
-let cached = global.mongoose
-
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null }
-}
+let cached = global.mongoose || { conn: null, promise: null }
+global.mongoose = cached
 
 export default async function connectDB() {
+  const MONGODB_URI = process.env.MONGODB_URI
+  if (!MONGODB_URI) throw new Error('MONGODB_URI no está configurada en las variables de entorno')
+
   if (cached.conn) return cached.conn
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
-      bufferCommands: false,
-    })
+    cached.promise = mongoose.connect(MONGODB_URI, { bufferCommands: false })
   }
 
   cached.conn = await cached.promise

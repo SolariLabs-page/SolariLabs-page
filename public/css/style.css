@@ -109,6 +109,35 @@ button, input, select, textarea { font: inherit; }
 .nav-link:hover { color: var(--text); background: var(--surface); }
 .nav-link.active { color: var(--amber); background: var(--amber-dim); }
 
+/* ── Password toggle ────────────────────────────────────────── */
+.pwd-field {
+  position: relative;
+}
+
+.pwd-field input {
+  padding-right: 46px;
+}
+
+.pwd-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: color var(--tr);
+  line-height: 0;
+}
+
+.pwd-toggle:hover { color: var(--amber); }
+
 /* ── Hamburger button ───────────────────────────────────────── */
 .hamburger {
   display: none;

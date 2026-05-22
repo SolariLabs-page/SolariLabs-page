@@ -1,5 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500&display=swap");
 
+/* ── Variables ─────────────────────────────────────────────── */
+:root {
   --bg:        #080605;
   --surface:   #100d0b;
   --surface2:  #181310;

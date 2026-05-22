@@ -91,19 +91,46 @@
 <!-- Edit sale modal -->
 <div id="modal-edit" class="modal" hidden>
   <div class="modal-overlay" id="edit-overlay"></div>
-  <div class="modal-box" style="max-width:420px">
+  <div class="modal-box" style="max-width:580px;max-height:90vh;overflow-y:auto">
     <h2>Editar venta</h2>
-    <div id="edit-items" style="margin:16px 0;display:flex;flex-direction:column;gap:8px"></div>
-    <form id="edit-form" class="form-grid" style="margin-top:8px">
+    <form id="edit-form" class="form-grid" style="margin-top:20px">
+
       <div class="field">
-        <label>Total (₡)</label>
+        <label>Fecha y hora</label>
+        <input type="datetime-local" id="edit-date" required>
+      </div>
+
+      <div class="field">
+        <label>Productos</label>
+        <div id="edit-items-container" style="display:flex;flex-direction:column;gap:8px"></div>
+        <button type="button" class="btn btn-ghost btn-sm" id="edit-add-item" style="margin-top:8px;width:100%">
+          + Agregar producto
+        </button>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border)">
+        <span style="color:var(--muted);font-size:.9rem">Total calculado</span>
+        <span id="edit-calc-total" style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--amber)">₡0</span>
+      </div>
+
+      <div class="field">
+        <label>Total final (₡) — podés ajustarlo si hubo descuento</label>
         <input type="number" id="edit-total" min="0" required>
       </div>
+
       <div class="field">
-        <label>Nota</label>
-        <textarea id="edit-notes" rows="2" placeholder="Nota interna (opcional)"></textarea>
+        <label>Nota (opcional)</label>
+        <textarea id="edit-notes" rows="2" placeholder="Nota interna…"></textarea>
       </div>
-      <p style="color:var(--muted);font-size:.8rem">El stock no se modifica al editar una venta.</p>
+
+      <label class="toggle-row" style="padding:14px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border);align-items:flex-start;gap:12px">
+        <input type="checkbox" id="edit-apply-inventory" style="margin-top:2px">
+        <div>
+          <div style="font-weight:500">Aplicar cambios al inventario</div>
+          <div style="color:var(--muted);font-size:.82rem;margin-top:3px">Se restaura el stock original y se descuenta el nuevo. Útil si cambiaste productos o cantidades.</div>
+        </div>
+      </label>
+
       <div class="modal-actions">
         <button type="button" class="btn btn-ghost" id="edit-cancel">Cancelar</button>
         <button type="submit" class="btn btn-amber" id="edit-save">Guardar cambios</button>
@@ -115,11 +142,19 @@
 <!-- Delete sale modal -->
 <div id="modal-delete" class="modal" hidden>
   <div class="modal-overlay" id="delete-overlay"></div>
-  <div class="modal-box" style="max-width:380px">
+  <div class="modal-box" style="max-width:400px">
     <h2>¿Eliminar esta venta?</h2>
-    <p style="color:var(--muted);margin:12px 0 8px">Vas a eliminar el registro de <strong id="delete-sale-name" style="color:var(--text)"></strong>.</p>
-    <p style="color:var(--muted);font-size:.85rem;margin-bottom:24px">El stock <strong style="color:var(--text)">no se restaura</strong> — solo se elimina el historial.</p>
-    <div class="modal-actions">
+    <p style="color:var(--muted);margin:12px 0 20px">Vas a eliminar <strong id="delete-sale-name" style="color:var(--text)"></strong> del historial.</p>
+
+    <label class="toggle-row" style="padding:14px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border);align-items:flex-start;gap:12px">
+      <input type="checkbox" id="delete-restore-stock" style="margin-top:2px">
+      <div>
+        <div style="font-weight:500">Restaurar stock al inventario</div>
+        <div style="color:var(--muted);font-size:.82rem;margin-top:3px">Las unidades de esta venta se suman de nuevo al inventario.</div>
+      </div>
+    </label>
+
+    <div class="modal-actions" style="margin-top:20px">
       <button type="button" class="btn btn-ghost" id="delete-cancel">Cancelar</button>
       <button type="button" class="btn btn-danger-outline" id="delete-confirm">Sí, eliminar</button>
     </div>

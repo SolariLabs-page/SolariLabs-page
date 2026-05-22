@@ -1,5 +1,6 @@
 import connectDB from '../_lib/db.js'
 import Sale from '../_lib/Sale.js'
+import Product from '../_lib/Product.js'
 import { requireAuth } from '../_lib/auth.js'
 
 export default async function handler(req, res) {
@@ -22,22 +23,50 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'PUT') {
-      const { notes, total } = req.body || {}
-      const updates = {}
+      const { items, createdAt, notes, total, applyToInventory } = req.body || {}
 
-      // Solo se permite editar notas y total — el stock NO se toca
-      if (notes !== undefined) updates.notes = notes
-      if (total !== undefined) updates.total = Number(total)
-
-      const sale = await Sale.findByIdAndUpdate(id, updates, { new: true })
+      const sale = await Sale.findById(id)
       if (!sale) return res.status(404).json({ error: 'Venta no encontrada' })
-      return res.status(200).json(sale)
+
+      if (applyToInventory) {
+        // 1. Restaurar stock de los items originales
+        await Promise.all(sale.items.map(item =>
+          Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } })
+            .catch(() => {})
+        ))
+        // 2. Descontar stock de los nuevos items
+        if (items?.length) {
+          await Promise.all(items.map(item =>
+            Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } })
+              .catch(() => {})
+          ))
+        }
+      }
+
+      const updates = {}
+      if (items?.length)       updates.items     = items
+      if (createdAt)           updates.createdAt = new Date(createdAt)
+      if (notes  !== undefined) updates.notes    = notes
+      if (total  !== undefined) updates.total    = Number(total)
+
+      const updated = await Sale.findByIdAndUpdate(id, updates, { new: true })
+      return res.status(200).json(updated)
     }
 
     if (req.method === 'DELETE') {
-      // Elimina solo el registro histórico — el stock NO se restaura
-      const sale = await Sale.findByIdAndDelete(id)
+      const { restoreStock } = req.body || {}
+
+      const sale = await Sale.findById(id)
       if (!sale) return res.status(404).json({ error: 'Venta no encontrada' })
+
+      if (restoreStock) {
+        await Promise.all(sale.items.map(item =>
+          Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity } })
+            .catch(() => {})
+        ))
+      }
+
+      await Sale.findByIdAndDelete(id)
       return res.status(200).json({ success: true })
     }
 

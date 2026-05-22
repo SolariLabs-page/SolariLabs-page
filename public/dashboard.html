@@ -95,9 +95,15 @@
     <h2>Editar venta</h2>
     <form id="edit-form" class="form-grid" style="margin-top:20px">
 
-      <div class="field">
-        <label>Fecha y hora</label>
-        <input type="datetime-local" id="edit-date" required>
+      <div class="form-row">
+        <div class="field">
+          <label>Fecha</label>
+          <input type="date" id="edit-date-day" required>
+        </div>
+        <div class="field">
+          <label>Hora</label>
+          <input type="time" id="edit-time" required>
+        </div>
       </div>
 
       <div class="field">

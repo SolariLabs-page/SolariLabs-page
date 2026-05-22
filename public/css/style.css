@@ -1,7 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500&display=swap");
 
-/* ── Variables ─────────────────────────────────────────────── */
+/* Fuerza dark mode en pickers nativos del browser */
 :root {
+  color-scheme: dark;
+}
   --bg:        #080605;
   --surface:   #100d0b;
   --surface2:  #181310;
@@ -907,6 +909,9 @@ input[type="number"],
 input[type="search"],
 input[type="email"],
 input[type="password"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
 select,
 textarea {
   width: 100%;
@@ -1186,4 +1191,23 @@ textarea { resize: vertical; }
 
 @media (max-width: 768px) {
   .checkout-layout { grid-template-columns: 1fr; }
+}
+
+/* ── Date / Time picker icons ───────────────────────────────── */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  background-color: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  filter: invert(0.5);
+  transition: filter var(--tr);
+  border-radius: 4px;
+  padding: 2px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+  filter: invert(0.8) sepia(1) saturate(3) hue-rotate(10deg);
 }

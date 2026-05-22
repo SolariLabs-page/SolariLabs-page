@@ -105,8 +105,10 @@ async function openEdit(id) {
 
   const products = await loadProductsForEdit()
 
-  // Fecha
-  document.querySelector('#edit-date').value = toDatetimeLocal(sale.createdAt)
+  // Fecha + hora separadas
+  const dt = toDatetimeLocal(sale.createdAt)
+  document.querySelector('#edit-date-day').value = dt.slice(0, 10)
+  document.querySelector('#edit-time').value      = dt.slice(11, 16)
 
   // Notas y total
   document.querySelector('#edit-notes').value = sale.notes || ''
@@ -214,7 +216,9 @@ async function handleEditSubmit(e) {
 
   try {
     const items           = collectItems()
-    const createdAt       = document.querySelector('#edit-date').value
+    const dateDay         = document.querySelector('#edit-date-day').value
+    const dateTime        = document.querySelector('#edit-time').value || '00:00'
+    const createdAt       = dateDay ? `${dateDay}T${dateTime}:00` : undefined
     const total           = Number(document.querySelector('#edit-total').value)
     const notes           = document.querySelector('#edit-notes').value.trim()
     const applyToInventory = document.querySelector('#edit-apply-inventory').checked

@@ -1,9 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500&display=swap");
 
-/* Fuerza dark mode en pickers nativos del browser */
-:root {
-  color-scheme: dark;
-}
   --bg:        #080605;
   --surface:   #100d0b;
   --surface2:  #181310;
@@ -1193,7 +1189,13 @@ textarea { resize: vertical; }
   .checkout-layout { grid-template-columns: 1fr; }
 }
 
-/* ── Date / Time picker icons ───────────────────────────────── */
+/* ── Date / Time picker — dark mode solo en esos inputs ──────── */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator,
 input[type="datetime-local"]::-webkit-calendar-picker-indicator {

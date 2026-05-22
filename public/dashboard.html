@@ -75,6 +75,7 @@
               <th>Unidades</th>
               <th>Total</th>
               <th></th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="sales-body"></tbody>
@@ -86,6 +87,44 @@
   </section>
 
 </main>
+
+<!-- Edit sale modal -->
+<div id="modal-edit" class="modal" hidden>
+  <div class="modal-overlay" id="edit-overlay"></div>
+  <div class="modal-box" style="max-width:420px">
+    <h2>Editar venta</h2>
+    <div id="edit-items" style="margin:16px 0;display:flex;flex-direction:column;gap:8px"></div>
+    <form id="edit-form" class="form-grid" style="margin-top:8px">
+      <div class="field">
+        <label>Total (₡)</label>
+        <input type="number" id="edit-total" min="0" required>
+      </div>
+      <div class="field">
+        <label>Nota</label>
+        <textarea id="edit-notes" rows="2" placeholder="Nota interna (opcional)"></textarea>
+      </div>
+      <p style="color:var(--muted);font-size:.8rem">El stock no se modifica al editar una venta.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="edit-cancel">Cancelar</button>
+        <button type="submit" class="btn btn-amber" id="edit-save">Guardar cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete sale modal -->
+<div id="modal-delete" class="modal" hidden>
+  <div class="modal-overlay" id="delete-overlay"></div>
+  <div class="modal-box" style="max-width:380px">
+    <h2>¿Eliminar esta venta?</h2>
+    <p style="color:var(--muted);margin:12px 0 8px">Vas a eliminar el registro de <strong id="delete-sale-name" style="color:var(--text)"></strong>.</p>
+    <p style="color:var(--muted);font-size:.85rem;margin-bottom:24px">El stock <strong style="color:var(--text)">no se restaura</strong> — solo se elimina el historial.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="delete-cancel">Cancelar</button>
+      <button type="button" class="btn btn-danger-outline" id="delete-confirm">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
 
 <div id="toast-container" class="toast-container"></div>
 <script src="js/auth.js"></script>
